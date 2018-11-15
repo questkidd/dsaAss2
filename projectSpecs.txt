@@ -1,0 +1,26 @@
+Assignment #2
+Students have learned different sorting algorithms during lectures. 
+The assignment is to create a small console based application which 
+can sort different types of data as per user's choice. The details are as follows:
+
+Create a console based program through which a user can chose which type of data he want to sort. 
+The data type choices will be: long, float, strings.
+User will then select the algorthim he want to use for sorting. The choices are: 
+Quick sort, merge sort, radix sort, and selection sort
+The user will also select whether he/she want to sort in ascending order or descending order
+The user will then given the input. Maximum size of the input is 100 items.
+After input has been given, the following should be shown in the output on the screen: 
+the array input, sorted array (asc or desc), and time complexity.
+User must be able to choice multiple sorting algorithms at a time. 
+In this case, the time complexity of each selected algorithm will be shown.
+Submission: Create a single Word/PDF file with the following:
+Download the assignment template file shared with assignment #1 on LMS. Use it for submission.
+You have to include the screenshots of the output followed by all source code in the file.
+Include the exe file which can be executed on a windows machine. 
+Please note that the exe file must be executed without any error or it will result into dedution of marks.
+It is a group task. All group member must participate equally in the assignment.
+
+Submission status
+Submission status	Nothing has been submitted for this assignment
+Grading status	Not graded
+Due date	Sunday, 18 November 2018, 11:55 PM

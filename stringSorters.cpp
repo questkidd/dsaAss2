@@ -4,18 +4,6 @@
 #include "sortersMETA.h"
 using namespace std;
 
-class sortersMETA {
-public:
-	sortersMETA() {
-		for (int i = 0; i <= 5; i++) { sorts[i] = false; }
-	}
-	static char dataType;
-	static bool ascending;
-	static bool sorts[5];
-	static const int ARRAYSIZE = 100;
-	static const int STRINGMAX = 5;
-}; // need a class for sorter META data
-
 
 template <class generic>
 class sorters : public sortersMETA{
@@ -70,10 +58,66 @@ private:
 
 public:
 	static void processSorts(generic data[]) {
-		if (sortersMETA::sorts[1]) { quickSort(data, 0, sortersMETA::ARRAYSIZE - 1); }
-		if (sortersMETA::sorts[2]) { mergeSort(data, 0, sortersMETA::ARRAYSIZE - 1); }
-		//if (sortersMETA::sorts[3]) { quickSort(data, 0, sortersMETA::ARRAYSIZE - 1); }
-		if (sortersMETA::sorts[4]) { selectionSort(data, sortersMETA::ARRAYSIZE); }
+		generic* duplicate = new generic[sortersMETA::ARRAYSIZE];
+		clock_t startTime;
+		bool printed = false;
+		double time[5] = { 0 };
+		if (sortersMETA::sorts[1]) { 
+			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
+			startTime = clock();
+			quickSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
+			time[1] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			cout << "Unsorted array" << endl;
+			displayArray(data);
+			cout << "Sorted array" << endl;
+			displayArray(duplicate);
+			cout << "Time taken by quick sort to sort the array: " << time[1] << endl;
+			printed = true;
+		}
+		if (sortersMETA::sorts[2]) { 
+			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
+			startTime = clock();
+			mergeSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1); 
+			time[2] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			if (!printed) {
+				cout << "Unsorted array" << endl;
+				displayArray(data);
+				cout << "Sorted array" << endl;
+				displayArray(duplicate);
+				printed = true;
+			}
+			cout << "Time taken by merge sort to sort the array: " << time[2] << endl;
+		}
+		/*
+		if (sortersMETA::sorts[3]) {
+			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
+			startTime = clock();
+			quickSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
+			time[3] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			if (!printed) {
+			cout << "Unsorted array" << endl;
+			displayArray(data);
+			cout << "Sorted array" << endl;
+			displayArray(duplicate);
+			printed = true;
+			}
+			cout << "Time taken by radix sort to sort the array: " << time[3] << endl;
+		}*/
+		if (sortersMETA::sorts[4]) { 
+			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
+			startTime = clock();
+			selectionSort(duplicate, sortersMETA::ARRAYSIZE);
+			time[4] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			if (!printed) {
+				cout << "Unsorted array" << endl;
+				displayArray(data);
+				cout << "Sorted array" << endl;
+				displayArray(duplicate);
+				printed = true;
+			}
+			cout << "Time taken by selection sort to sort the array: " << time[4] << endl;
+		}
+
 	}
 	static void quickSort(generic data[], int first, int last) {
 		int partitionIndex;
@@ -112,12 +156,10 @@ public:
 		cout << endl << endl;
 	}
 
-	static generic* arrayCopy(generic original[], int size) {
-		generic* duplicate = new generic[size];
+	static void arrayCopy(generic original[], generic duplicate[], int size) {
 		while (size--) {
 			duplicate[size] = original[size];
 		}
-		return duplicate;
 	}
 
 
@@ -132,7 +174,7 @@ void main(void) {
 	cin >> order;
 	sortersMETA::ascending = (order == 'a');
 	while (!sortersMETA::sorts[0]) {
-		cout << "Choose algorithms to run(If you want to run multiple algorithms, enter values seperated by spaces):\t";
+		cout << "Choose algorithms to run(If you want to run multiple algorithms, enter values seperated by spaces):" << endl;
 		cout << "1. Quick sort" << endl;
 		cout << "2. Merge sort" << endl;
 		cout << "3. Radix sort" << endl;

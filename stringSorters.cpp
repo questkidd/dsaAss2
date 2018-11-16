@@ -1,12 +1,25 @@
 #include <iostream>
+#include <string>
 #include <ctime>
+#include "sortersMETA.h"
+using namespace std;
+
+class sortersMETA {
+public:
+	sortersMETA() {
+		for (int i = 0; i <= 5; i++) { sorts[i] = false; }
+	}
+	static char dataType;
+	static bool ascending;
+	static bool sorts[5];
+	static const int ARRAYSIZE = 100;
+	static const int STRINGMAX = 5;
+}; // need a class for sorter META data
+
 
 template <class generic>
-class sorter {
+class sorters : public sortersMETA{
 private:
-	static bool ascending;
-	static char dataType = 's';
-	static const int STRINGMAX = 5;
 
 	static inline void arraySwap(generic* a, generic* b) {
 		generic temp = *a;
@@ -14,10 +27,10 @@ private:
 		*b = temp;
 	}
 
-	static int getMaxDigits(){
-		if(dataType == 's'){return STRINGMAX;}
-		else if(dataType == 'l'){return 10;}
-		else if (dataType == 'f'){return 7;}
+	static int getMaxDigits() {
+		if (sortersMETA::dataType == 's') { return sortersMETA::STRINGMAX; }
+		else if (sortersMETA::dataType == 'l') { return 10; }
+		else if (sortersMETA::dataType == 'f') { return 7; }
 	}
 
 	static int partition(generic data[], int first, int last) {
@@ -26,7 +39,7 @@ private:
 		int firstDisordered = first;						//disordered implies it is more than the pivot if sorting by ascending
 
 		for (counter = first; counter < last; counter++) {
-			if ((data[counter] < data[pivot] && ascending) || (data[counter] > data[pivot] && !ascending)) {
+			if ((data[counter] < data[pivot] && sortersMETA::ascending) || (data[counter] > data[pivot] && !sortersMETA::ascending)) {
 				arraySwap(&data[counter], &data[firstDisordered]);
 				firstDisordered++;
 			}
@@ -42,7 +55,7 @@ private:
 		int tempCounter = 0;
 
 		while (arrayOneCounter <= middle && arrayTwoCounter <= high) {
-			if ((data[arrayOneCounter] < data[arrayTwoCounter] && ascending) || (data[arrayOneCounter] > data[arrayTwoCounter] && !ascending)) { temp[tempCounter++] = data[arrayOneCounter++]; }
+			if ((data[arrayOneCounter] < data[arrayTwoCounter] && sortersMETA::ascending) || (data[arrayOneCounter] > data[arrayTwoCounter] && !sortersMETA::ascending)) { temp[tempCounter++] = data[arrayOneCounter++]; }
 			else { temp[tempCounter++] = data[arrayTwoCounter++]; }
 		}
 
@@ -56,6 +69,12 @@ private:
 	}
 
 public:
+	static void processSorts(generic data[]) {
+		if (sortersMETA::sorts[1]) { quickSort(data, 0, sortersMETA::ARRAYSIZE - 1); }
+		if (sortersMETA::sorts[2]) { mergeSort(data, 0, sortersMETA::ARRAYSIZE - 1); }
+		//if (sortersMETA::sorts[3]) { quickSort(data, 0, sortersMETA::ARRAYSIZE - 1); }
+		if (sortersMETA::sorts[4]) { selectionSort(data, sortersMETA::ARRAYSIZE); }
+	}
 	static void quickSort(generic data[], int first, int last) {
 		int partitionIndex;
 		if ((last - first)>0) {
@@ -80,7 +99,7 @@ public:
 		for (int i = 0; i < size - 1; i++) {
 			extreme = i;
 			for (int j = i + 1; j < size; j++) {
-				if ((data[j] < data[extreme] && ascending) || (data[j] > data[extreme] && !ascending)) {
+				if ((data[j] < data[extreme] && sortersMETA::ascending) || (data[j] > data[extreme] && !sortersMETA::ascending)) {
 					extreme = j;
 				}
 			}
@@ -89,8 +108,8 @@ public:
 	}
 
 	static void displayArray(generic arr[]) {
-		for (int i = 0; i< ARRAYSIZE; i++) { cout << arr[i] << "\t"; }
-			cout << endl << endl;
+		for (int i = 0; i< sortersMETA::ARRAYSIZE; i++) { cout << arr[i] << "\t"; }
+		cout << endl << endl;
 	}
 
 	static generic* arrayCopy(generic original[], int size) {
@@ -103,3 +122,46 @@ public:
 
 
 };
+
+void main(void) {
+	sortersMETA();//initializing the static members of the class
+	cout << "Please select data type(l/f/s)" << endl;
+	cin >> sortersMETA::dataType;
+	cout << "Choose ascending or descending(a/s)" << endl;
+	char order;
+	cin >> order;
+	sortersMETA::ascending = (order == 'a');
+	while (!sortersMETA::sorts[0]) {
+		cout << "Choose algorithms to run(If you want to run multiple algorithms, enter values seperated by spaces):\t";
+		cout << "1. Quick sort" << endl;
+		cout << "2. Merge sort" << endl;
+		cout << "3. Radix sort" << endl;
+		cout << "4. Selection sort" << endl;
+		cout << "5. Start sorting process" << endl;
+		int choice;
+		cin >> choice;
+		sortersMETA::sorts[choice % 5] = true;
+	}
+
+	
+	switch (sortersMETA::dataType) {
+	case 'l':
+		long data[sortersMETA::ARRAYSIZE];
+		for (int i = 0; i < sortersMETA::ARRAYSIZE; i++) {
+			data[i] = rand() % 100;
+		}
+		sorters<long>::processSorts(data);
+
+		break;
+	//case 'f':
+	//	float data[sortersMETA::ARRAYSIZE];
+	//	for (int i = 0; i < sortersMETA::ARRAYSIZE; i++) {
+	//		data[i] =(float) (rand() % 100);
+	//	}
+	//	//sorters<float> sorter;
+	//	break;
+	case 's':
+		//sorters<string>::processSorts(data);
+		break;
+	}
+}

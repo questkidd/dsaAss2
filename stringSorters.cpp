@@ -6,7 +6,7 @@ using namespace std;
 
 
 template <class generic>
-class sorters : public sortersMETA{
+class sorters{
 private:
 
 	static inline void arraySwap(generic* a, generic* b) {
@@ -169,7 +169,7 @@ void main(void) {
 	sortersMETA();//initializing the static members of the class
 	cout << "Please select data type(l/f/s)" << endl;
 	cin >> sortersMETA::dataType;
-	cout << "Choose ascending or descending(a/s)" << endl;
+	cout << "Choose ascending or descending(a/d)" << endl;
 	char order;
 	cin >> order;
 	sortersMETA::ascending = (order == 'a');
@@ -188,20 +188,21 @@ void main(void) {
 	
 	switch (sortersMETA::dataType) {
 	case 'l':
-		long data[sortersMETA::ARRAYSIZE];
+		//if radix sort selected, prevent input of negative numbers
+		long ldata[sortersMETA::ARRAYSIZE];
 		for (int i = 0; i < sortersMETA::ARRAYSIZE; i++) {
-			data[i] = rand() % 100;
+			ldata[i] = rand() % 100;
 		}
-		sorters<long>::processSorts(data);
+		sorters<long>::processSorts(ldata);
 
 		break;
-	//case 'f':
-	//	float data[sortersMETA::ARRAYSIZE];
-	//	for (int i = 0; i < sortersMETA::ARRAYSIZE; i++) {
-	//		data[i] =(float) (rand() % 100);
-	//	}
-	//	//sorters<float> sorter;
-	//	break;
+	case 'f':
+		float fdata[sortersMETA::ARRAYSIZE];
+		for (int i = 0; i < sortersMETA::ARRAYSIZE; i++) {
+			fdata[i] =(float) (rand() % 100);
+		}
+		sorters<float>::processSorts(fdata);
+		break;
 	case 's':
 		//sorters<string>::processSorts(data);
 		break;

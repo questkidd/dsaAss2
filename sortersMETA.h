@@ -4,7 +4,8 @@ public:
 	sortersMETA();
 	static char dataType;
 	static bool ascending;
+	static int currentStringIndex;
 	static bool sorts[5];
-	static const int ARRAYSIZE = 10000;
-	static const int STRINGMAX = 5;
+	static const int ARRAYSIZE = 7;
+	static const int STRINGMAX = 6;
 }; // need a class for sorter META data

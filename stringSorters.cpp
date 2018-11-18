@@ -5,6 +5,10 @@
 using namespace std;
 
 
+template <class generic> string convertToString(generic input) { return to_string(input); }
+//template <> string convertToString<float>(float input) { return input; }
+template <> string convertToString<string>(string input) { return input; }
+
 template <class generic>
 class sorters{
 private:
@@ -25,11 +29,24 @@ private:
 		int counter;
 		int pivot = last;
 		int firstDisordered = first;						//disordered implies it is more than the pivot if sorting by ascending
-
-		for (counter = first; counter < last; counter++) {
-			if ((data[counter] < data[pivot] && sortersMETA::ascending) || (data[counter] > data[pivot] && !sortersMETA::ascending)) {
-				arraySwap(&data[counter], &data[firstDisordered]);
-				firstDisordered++;
+		if(sortersMETA::dataType == 's'){
+			for (counter = first; counter < last; counter++){
+				string element = convertToString(data[counter]);
+				char counterc = element[sortersMETA::currentStringIndex];
+				string pivotstr = convertToString(data[pivot]);
+				char pivotc = pivotstr[sortersMETA::currentStringIndex];
+				if (counterc < pivotc && sortersMETA::ascending || counterc > pivotc && !sortersMETA::ascending) {
+					arraySwap(&data[counter], &data[firstDisordered]);
+					firstDisordered++;
+				}
+			}
+		}
+		else {
+			for (counter = first; counter < last; counter++) {
+				if ((data[counter] < data[pivot] && sortersMETA::ascending) || (data[counter] > data[pivot] && !sortersMETA::ascending)) {
+					arraySwap(&data[counter], &data[firstDisordered]);
+					firstDisordered++;
+				}
 			}
 		}
 		arraySwap(&data[pivot], &data[firstDisordered]);
@@ -42,31 +59,51 @@ private:
 		int arrayTwoCounter = middle + 1;
 		int tempCounter = 0;
 
-		while (arrayOneCounter <= middle && arrayTwoCounter <= high) {
-			if ((data[arrayOneCounter] < data[arrayTwoCounter] && sortersMETA::ascending) || (data[arrayOneCounter] > data[arrayTwoCounter] && !sortersMETA::ascending)) { temp[tempCounter++] = data[arrayOneCounter++]; }
-			else { temp[tempCounter++] = data[arrayTwoCounter++]; }
-		}
+		if (sortersMETA::dataType == 's') {
+			while (arrayOneCounter <= middle && arrayTwoCounter <= high) {
+				if ((convertToString(data[arrayOneCounter])[sortersMETA::currentStringIndex] < convertToString(data[arrayTwoCounter])[sortersMETA::currentStringIndex] && sortersMETA::ascending) || (convertToString(data[arrayOneCounter])[sortersMETA::currentStringIndex] > convertToString(data[arrayTwoCounter])[sortersMETA::currentStringIndex] && !sortersMETA::ascending)) { temp[tempCounter++] = data[arrayOneCounter++]; }
+				else { temp[tempCounter++] = data[arrayTwoCounter++]; }
+			}
 
+		} else {
+			while (arrayOneCounter <= middle && arrayTwoCounter <= high) {
+				if ((data[arrayOneCounter] < data[arrayTwoCounter] && sortersMETA::ascending) || (data[arrayOneCounter] > data[arrayTwoCounter] && !sortersMETA::ascending)) { temp[tempCounter++] = data[arrayOneCounter++]; }
+				else { temp[tempCounter++] = data[arrayTwoCounter++]; }
+			}
+		}
 		while (arrayOneCounter <= middle) { temp[tempCounter++] = data[arrayOneCounter++]; }
 		while (arrayTwoCounter <= high) { temp[tempCounter++] = data[arrayTwoCounter++]; }
 
 		for (arrayOneCounter = low; arrayOneCounter <= high; arrayOneCounter++) {
 			data[arrayOneCounter] = temp[arrayOneCounter - low];
 		}
-		delete temp;
+		delete[] temp;
 	}
 
 public:
 	static void processSorts(generic data[]) {
 		generic* duplicate = new generic[sortersMETA::ARRAYSIZE];
+		sortersMETA::currentStringIndex = sortersMETA::STRINGMAX;
 		clock_t startTime;
 		bool printed = false;
 		double time[5] = { 0 };
 		if (sortersMETA::sorts[1]) { 
 			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
-			startTime = clock();
-			quickSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
-			time[1] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			if (sortersMETA::dataType == 's') {
+				startTime = clock();
+				while (sortersMETA::currentStringIndex--) {
+					quickSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
+				}
+				time[1] = double(clock() - startTime) / CLOCKS_PER_SEC;
+				sortersMETA::currentStringIndex = sortersMETA::STRINGMAX;
+
+
+			}
+			else {
+				startTime = clock();
+				quickSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
+				time[1] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			}
 			cout << "Unsorted array" << endl;
 			displayArray(data);
 			cout << "Sorted array" << endl;
@@ -76,9 +113,19 @@ public:
 		}
 		if (sortersMETA::sorts[2]) { 
 			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
-			startTime = clock();
-			mergeSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1); 
-			time[2] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			if (sortersMETA::dataType == 's') {
+				startTime = clock();
+				while (sortersMETA::currentStringIndex--) {
+					mergeSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
+				}
+				time[2] = double(clock() - startTime) / CLOCKS_PER_SEC;
+				sortersMETA::currentStringIndex = sortersMETA::STRINGMAX;
+			}
+			else {
+				startTime = clock();
+				mergeSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
+				time[2] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			}
 			if (!printed) {
 				cout << "Unsorted array" << endl;
 				displayArray(data);
@@ -105,9 +152,21 @@ public:
 		}*/
 		if (sortersMETA::sorts[4]) { 
 			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
-			startTime = clock();
-			selectionSort(duplicate, sortersMETA::ARRAYSIZE);
-			time[4] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			if (sortersMETA::dataType == 's') {
+				startTime = clock();
+				while (sortersMETA::currentStringIndex--) {
+					selectionSort(duplicate, sortersMETA::ARRAYSIZE);
+				}
+				time[4] = double(clock() - startTime) / CLOCKS_PER_SEC;
+				sortersMETA::currentStringIndex = sortersMETA::STRINGMAX;
+
+
+			}
+			else {
+				startTime = clock();
+				selectionSort(duplicate, sortersMETA::ARRAYSIZE);
+				time[4] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			}
 			if (!printed) {
 				cout << "Unsorted array" << endl;
 				displayArray(data);
@@ -117,6 +176,7 @@ public:
 			}
 			cout << "Time taken by selection sort to sort the array: " << time[4] << endl;
 		}
+		delete[] duplicate; // causes error for some reason, but after changing delete to delete[], no errors!
 
 	}
 	static void quickSort(generic data[], int first, int last) {
@@ -140,14 +200,27 @@ public:
 
 	static void selectionSort(generic data[], int size) {
 		int extreme;
-		for (int i = 0; i < size - 1; i++) {
-			extreme = i;
-			for (int j = i + 1; j < size; j++) {
-				if ((data[j] < data[extreme] && sortersMETA::ascending) || (data[j] > data[extreme] && !sortersMETA::ascending)) {
-					extreme = j;
+		if (sortersMETA::dataType == 's') {
+			for (int i = 0; i < size - 1; i++) {
+				extreme = i;
+				for (int j = i + 1; j < size; j++) {
+					if ((convertToString(data[j])[sortersMETA::currentStringIndex] < convertToString(data[extreme])[sortersMETA::currentStringIndex] && sortersMETA::ascending) || (convertToString(data[j])[sortersMETA::currentStringIndex] > convertToString(data[extreme])[sortersMETA::currentStringIndex] && !sortersMETA::ascending)) {
+						extreme = j;
+					}
 				}
+				arraySwap(&data[i], &data[extreme]);
 			}
-			arraySwap(&data[i], &data[extreme]);
+		}
+		else {
+			for (int i = 0; i < size - 1; i++) {
+				extreme = i;
+				for (int j = i + 1; j < size; j++) {
+					if ((data[j] < data[extreme] && sortersMETA::ascending) || (data[j] > data[extreme] && !sortersMETA::ascending)) {
+						extreme = j;
+					}
+				}
+				arraySwap(&data[i], &data[extreme]);
+			}
 		}
 	}
 
@@ -204,7 +277,15 @@ void main(void) {
 		sorters<float>::processSorts(fdata);
 		break;
 	case 's':
-		//sorters<string>::processSorts(data);
+		string sdata[sortersMETA::ARRAYSIZE] = { "Faraz", "Lihaz", "Ilyas", "Udaas", "Khaas", "Daraz", "Nawaz" };
+		//char carray[7][6] = { "Faraz", "Lihaz", "Ilyas", "Udaas", "Khaas", "Daaaz", "Nawaz" };
+		sorters<string>::processSorts(sdata);
 		break;
 	}
 }
+
+/*
+template <typename T> void foo() { /* generic implementation   }
+
+template <> void foo<animal>() { /* specific for T = animal  }
+*/

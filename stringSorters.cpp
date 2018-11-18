@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
+#include <queue>
 #include "sortersMETA.h"
 using namespace std;
 
@@ -12,7 +13,6 @@ template <> string convertToString<string>(string input) { return input; }
 template <class generic>
 class sorters{
 private:
-
 	static inline void arraySwap(generic* a, generic* b) {
 		generic temp = *a;
 		*a = *b;
@@ -80,6 +80,64 @@ private:
 		delete[] temp;
 	}
 
+	static void countingSort(generic data[], int length, int digit) {
+		int i;
+		int largest = 256;//max value of char being 255
+		generic* sorted = new generic[sortersMETA::ARRAYSIZE];
+		int* counter = new int[largest + 1];
+		for (i = 0; i <= largest; i++) { counter[i] = 0; }
+		for (i = 0; i < length; i++) { counter[ (digit < (int)convertToString(data[i]).length()) ? convertToString(data[i])[digit] : 256]++; }
+		for (i = 1; i <= largest; i++) { counter[i] += counter[i - 1]; }
+		for (i = length - 1; i >= 0; i--) { sorted[--counter[(digit < (int)convertToString(data[i]).length()) ? convertToString(data[i])[digit] : 256]] = data[i]; }
+		for (i = 0; i < length; i++) { data[i] = sorted[i]; }
+		/*
+		bool alphanumeric = sortersMETA::dataType == 's';
+		int arrayCounter;
+		generic largest = !alphanumeric ? data[0] : convertToString(data[0])[sortersMETA::currentStringIndex];
+		generic* sorted = new generic[sortersMETA::ARRAYSIZE];
+		for (arrayCounter = 1; arrayCounter < length; arrayCounter++) {
+			if (!alphanumeric && largest < data[arrayCounter]) {
+				largest = data[arrayCounter];
+			}
+			else if (alphanumeric && largest < convertToString(data[arrayCounter])[sortersMETA::currentStringIndex]) {
+				largest = convertToString(data[arrayCounter])[sortersMETA::currentStringIndex];
+			}
+		}
+		generic* counter = new generic[largest + 1];
+		for (i = 0; i <= largest; i++) {
+			counter[i] = 0;
+		}
+		if (!alphanumeric) {
+			for (i = 0; i < length; i++) {
+				counter[data[i]]++;
+			}
+		}
+		else {
+			for (i = 0; i < length; i++) {
+				counter[convertToString(data[i])[sortersMETA::currentStringIndex]]++;
+			}
+		}
+		for (i = 1; i <= largest; i++) {
+			counter[i] += counter[i - 1];
+		}
+		for (i = length - 1; i >= 0; i--) {
+			sorted[--counter[data[i]]] = data[i];
+		}
+		if (sortersMETA::ascending) {
+			for (i = 0; i < length; i++) {
+				data[i] = sorted[i];
+			}
+		}
+		else {
+			for (i = 0; i < length; i++) {
+				data[sortersMETA::ARRAYSIZE - 1 - i] = sorted[i];
+			}
+		}
+		delete sorted;
+		delete counter;
+		*/
+	}
+
 public:
 	static void processSorts(generic data[]) {
 		generic* duplicate = new generic[sortersMETA::ARRAYSIZE];
@@ -135,11 +193,10 @@ public:
 			}
 			cout << "Time taken by merge sort to sort the array: " << time[2] << endl;
 		}
-		/*
 		if (sortersMETA::sorts[3]) {
 			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
 			startTime = clock();
-			quickSort(duplicate, 0, sortersMETA::ARRAYSIZE - 1);
+			radixSort(duplicate, sortersMETA::ARRAYSIZE);
 			time[3] = double(clock() - startTime) / CLOCKS_PER_SEC;
 			if (!printed) {
 			cout << "Unsorted array" << endl;
@@ -149,7 +206,7 @@ public:
 			printed = true;
 			}
 			cout << "Time taken by radix sort to sort the array: " << time[3] << endl;
-		}*/
+		}
 		if (sortersMETA::sorts[4]) { 
 			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
 			if (sortersMETA::dataType == 's') {
@@ -197,6 +254,36 @@ public:
 			merge(data, low, middle, high);
 		}
 	}
+
+	//maybe convert floats to strings, and sort them that way?
+
+	static void radixSort(generic data[], int size) {
+		int maxDigits = getMaxDigits();
+		for (int digit = maxDigits; digit > 0; digit--) { //
+			countingSort(data, size, digit - 1);
+		}
+
+	}
+
+	//static void radixSort(generic data[], int length) {
+	//	register int digitCounter, counterOne, counterTwo, factor;
+	//	//int radix = sorters::META == 's'?256:10;
+	//	const int radix = 10;
+	//	int maxdigits = getMaxDigits();
+	//	//queue<generic> queues = new queue<generic>[radix];
+	//	queue<generic> queues[radix];
+	//	for (digitCounter = 0, factor = 1; digitCounter < maxdigits; factor *= radix, digitCounter++) {
+	//		for (counterOne = 0; counterOne <length; counterOne++) {
+	//			queues[(data[counterOne] / factor) % radix].push(data[counterOne]);
+	//		}
+	//		for (counterOne = counterTwo = 0; counterOne < radix; counterOne++) {
+	//			while (!queues[counterOne].empty()) {
+	//				data[counterTwo++] = queues[counterOne].front();
+	//				queues[counterOne].pop();
+	//			}
+	//		}
+	//	}
+	//}
 
 	static void selectionSort(generic data[], int size) {
 		int extreme;

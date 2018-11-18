@@ -55,10 +55,15 @@ template <class generic> void countingSort(generic data[], int length, int digit
 	//arrayShow(counter, largest + 1);
 	for (i = length - 1; i >= 0; i--) { sorted[--counter[getDigitAt(data[i], digit)]] = data[i]; }
 	//sorters<generic>::displayArray(sorted);
-	for (i = 0; i < length; i++) { data[i] = sorted[i]; }
+	if (digit == 0 && !sortersMETA::ascending) {
+		for (i = 0; i < length; i++) { data[i] = sorted[length - 1 - i]; }
+	} else {
+		for (i = 0; i < length; i++) { data[i] = sorted[i]; }
+	}
 	/*if (sortersMETA::ascending) { for (i = 0; i < length; i++) { data[i] = sorted[i]; } }
 	else { for (i = 0; i < length; i++) { data[length - 1 - i] = sorted[i]; } }
 	sorters<generic>::displayArray(data);*/
+
 }
 
 
@@ -71,8 +76,14 @@ template <> void countingSort<string>(string data[], int length, int digit) {
 	for (i = 0; i < length; i++) { counter[(digit < (int)data[i].length()) ? data[i][digit] : 256]++; }
 	for (i = 1; i <= largest; i++) { counter[i] += counter[i - 1]; }
 	for (i = length - 1; i >= 0; i--) { sorted[--counter[(digit < (int)data[i].length()) ? data[i][digit] : 256]] = data[i]; }
-	if (sortersMETA::ascending) { for (i = 0; i < length; i++) { data[i] = sorted[i]; } }
-	else { for (i = 0; i < length; i++) { data[length - 1 - i] = sorted[i]; } }
+	if (digit == 0 && !sortersMETA::ascending) {
+		for (i = 0; i < length; i++) { data[i] = sorted[length - 1 - i]; }
+	}
+	else {
+		for (i = 0; i < length; i++) { data[i] = sorted[i]; }
+	}
+	/*if (sortersMETA::ascending) { for (i = 0; i < length; i++) { data[i] = sorted[i]; } }
+	else { for (i = 0; i < length; i++) { data[length - 1 - i] = sorted[i]; } }*/
 }
 
 

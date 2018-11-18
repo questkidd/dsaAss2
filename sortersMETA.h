@@ -9,4 +9,6 @@ public:
 	static int radixSortIndex;
 	static const int ARRAYSIZE = 7;
 	static const int STRINGMAX = 6;
+	static const int maxFloatDecimal = 1;
+	static const int maxFloatWhole = 1;
 }; // need a class for sorter META data

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
+#include <cmath>
 #include <queue>
 #include "sortersMETA.h"
 using namespace std;
@@ -9,6 +10,138 @@ using namespace std;
 template <class generic> string convertToString(generic input) { return to_string(input); }
 //template <> string convertToString<float>(float input) { return input; }
 template <> string convertToString<string>(string input) { return input; }
+
+
+template <class generic> int getDigitAt(generic input, int digit) { return to_string(input); }
+template <> int getDigitAt<float>(float input, int digit) {
+	int ivalue = input * pow(10, sortersMETA::maxFloatDecimal);
+	int factor = pow(10, sortersMETA::maxFloatDecimal + sortersMETA::maxFloatWhole - digit - 1);
+	ivalue /= factor;
+	factor *= 10;
+	ivalue %= factor;
+	return ivalue;
+}
+template <> int getDigitAt<long>(long input, int digit) {
+	int ivalue = input;
+	int factor = pow(10, 10-digit-1);
+	ivalue /= factor;
+	factor *= 10;
+	ivalue %= factor;
+	return ivalue;
+}
+
+void arrayShow(int arr[], int size) {
+	for (int i = 0; i < size; i++) {
+		cout << arr[i] << "\t";
+	}
+}
+
+
+template <class generic> void countingSort(generic data[], int length, int digit) {
+	/*if (sortersMETA::dataType == 'f') {
+		for (int i = 0; i < length; i++) {
+			data[i] *= pow(10, sortersMETA::maxFloatDecimal);
+		}
+	}*/
+	int i;
+	int largest = 9;//max value of char being 255
+	generic* sorted = new generic[sortersMETA::ARRAYSIZE];
+	int* counter = new int[largest + 1];
+	for (i = 0; i <= largest; i++) { counter[i] = 0; }
+	//arrayShow(counter, largest + 1);
+	for (i = 0; i < length; i++) { counter[getDigitAt(data[i], digit)]++; }
+	//arrayShow(counter, largest + 1);
+	for (i = 1; i <= largest; i++) { counter[i] += counter[i - 1]; }
+	//arrayShow(counter, largest + 1);
+	for (i = length - 1; i >= 0; i--) { sorted[--counter[getDigitAt(data[i], digit)]] = data[i]; }
+	//sorters<generic>::displayArray(sorted);
+	for (i = 0; i < length; i++) { data[i] = sorted[i]; }
+	/*if (sortersMETA::ascending) { for (i = 0; i < length; i++) { data[i] = sorted[i]; } }
+	else { for (i = 0; i < length; i++) { data[length - 1 - i] = sorted[i]; } }
+	sorters<generic>::displayArray(data);*/
+}
+
+
+template <> void countingSort<string>(string data[], int length, int digit) {
+	int i;
+	int largest = 256;//max value of char being 255
+	string* sorted = new string[sortersMETA::ARRAYSIZE];
+	int* counter = new int[largest + 1];
+	for (i = 0; i <= largest; i++) { counter[i] = 0; }
+	for (i = 0; i < length; i++) { counter[(digit < (int)data[i].length()) ? data[i][digit] : 256]++; }
+	for (i = 1; i <= largest; i++) { counter[i] += counter[i - 1]; }
+	for (i = length - 1; i >= 0; i--) { sorted[--counter[(digit < (int)data[i].length()) ? data[i][digit] : 256]] = data[i]; }
+	if (sortersMETA::ascending) { for (i = 0; i < length; i++) { data[i] = sorted[i]; } }
+	else { for (i = 0; i < length; i++) { data[length - 1 - i] = sorted[i]; } }
+}
+
+
+	/*
+
+		register int d, j, k, factor;
+		const int radix = 10;
+		const int digits = 10;
+		queue<generic> queues[radix];
+		for (d = 0, factor = 1; d < digits; factor *= radix, d++) {
+			for (j = 0; j < length; j++) {
+				queues[(int)(data[j] / factor) % radix].push(data[j]);
+			}
+			for (j = k = 0; j < radix; j++) {
+				while (!queues[j].empty()) {
+					data[k++] = queues[j].front();
+					queues[j].pop();
+				}
+
+			}
+		}
+	}
+	bool alphanumeric = sortersMETA::dataType == 's';
+	int arrayCounter;
+	generic largest = !alphanumeric ? data[0] : convertToString(data[0])[sortersMETA::currentStringIndex];
+	generic* sorted = new generic[sortersMETA::ARRAYSIZE];
+	for (arrayCounter = 1; arrayCounter < length; arrayCounter++) {
+	if (!alphanumeric && largest < data[arrayCounter]) {
+	largest = data[arrayCounter];
+	}
+	else if (alphanumeric && largest < convertToString(data[arrayCounter])[sortersMETA::currentStringIndex]) {
+	largest = convertToString(data[arrayCounter])[sortersMETA::currentStringIndex];
+	}
+	}
+	generic* counter = new generic[largest + 1];
+	for (i = 0; i <= largest; i++) {
+	counter[i] = 0;
+	}
+	if (!alphanumeric) {
+	for (i = 0; i < length; i++) {
+	counter[data[i]]++;
+	}
+	}
+	else {
+	for (i = 0; i < length; i++) {
+	counter[convertToString(data[i])[sortersMETA::currentStringIndex]]++;
+	}
+	}
+	for (i = 1; i <= largest; i++) {
+	counter[i] += counter[i - 1];
+	}
+	for (i = length - 1; i >= 0; i--) {
+	sorted[--counter[data[i]]] = data[i];
+	}
+	if (sortersMETA::ascending) {
+	for (i = 0; i < length; i++) {
+	data[i] = sorted[i];
+	}
+	}
+	else {
+	for (i = 0; i < length; i++) {
+	data[sortersMETA::ARRAYSIZE - 1 - i] = sorted[i];
+	}
+	}
+	delete sorted;
+	delete counter;
+	*/
+
+
 
 template <class generic>
 class sorters{
@@ -22,7 +155,7 @@ private:
 	static int getMaxDigits() {
 		if (sortersMETA::dataType == 's') { return sortersMETA::STRINGMAX; }
 		else if (sortersMETA::dataType == 'l') { return 10; }
-		else if (sortersMETA::dataType == 'f') { return 7; }
+		else if (sortersMETA::dataType == 'f') { return sortersMETA::maxFloatDecimal + sortersMETA::maxFloatWhole; }
 	}
 
 	static int partition(generic data[], int first, int last) {
@@ -78,64 +211,6 @@ private:
 			data[arrayOneCounter] = temp[arrayOneCounter - low];
 		}
 		delete[] temp;
-	}
-
-	static void countingSort(generic data[], int length, int digit) {
-		int i;
-		int largest = 256;//max value of char being 255
-		generic* sorted = new generic[sortersMETA::ARRAYSIZE];
-		int* counter = new int[largest + 1];
-		for (i = 0; i <= largest; i++) { counter[i] = 0; }
-		for (i = 0; i < length; i++) { counter[ (digit < (int)convertToString(data[i]).length()) ? convertToString(data[i])[digit] : 256]++; }
-		for (i = 1; i <= largest; i++) { counter[i] += counter[i - 1]; }
-		for (i = length - 1; i >= 0; i--) { sorted[--counter[(digit < (int)convertToString(data[i]).length()) ? convertToString(data[i])[digit] : 256]] = data[i]; }
-		for (i = 0; i < length; i++) { data[i] = sorted[i]; }
-		/*
-		bool alphanumeric = sortersMETA::dataType == 's';
-		int arrayCounter;
-		generic largest = !alphanumeric ? data[0] : convertToString(data[0])[sortersMETA::currentStringIndex];
-		generic* sorted = new generic[sortersMETA::ARRAYSIZE];
-		for (arrayCounter = 1; arrayCounter < length; arrayCounter++) {
-			if (!alphanumeric && largest < data[arrayCounter]) {
-				largest = data[arrayCounter];
-			}
-			else if (alphanumeric && largest < convertToString(data[arrayCounter])[sortersMETA::currentStringIndex]) {
-				largest = convertToString(data[arrayCounter])[sortersMETA::currentStringIndex];
-			}
-		}
-		generic* counter = new generic[largest + 1];
-		for (i = 0; i <= largest; i++) {
-			counter[i] = 0;
-		}
-		if (!alphanumeric) {
-			for (i = 0; i < length; i++) {
-				counter[data[i]]++;
-			}
-		}
-		else {
-			for (i = 0; i < length; i++) {
-				counter[convertToString(data[i])[sortersMETA::currentStringIndex]]++;
-			}
-		}
-		for (i = 1; i <= largest; i++) {
-			counter[i] += counter[i - 1];
-		}
-		for (i = length - 1; i >= 0; i--) {
-			sorted[--counter[data[i]]] = data[i];
-		}
-		if (sortersMETA::ascending) {
-			for (i = 0; i < length; i++) {
-				data[i] = sorted[i];
-			}
-		}
-		else {
-			for (i = 0; i < length; i++) {
-				data[sortersMETA::ARRAYSIZE - 1 - i] = sorted[i];
-			}
-		}
-		delete sorted;
-		delete counter;
-		*/
 	}
 
 public:
@@ -195,9 +270,25 @@ public:
 		}
 		if (sortersMETA::sorts[3]) {
 			arrayCopy(data, duplicate, sortersMETA::ARRAYSIZE);
-			startTime = clock();
-			radixSort(duplicate, sortersMETA::ARRAYSIZE);
-			time[3] = double(clock() - startTime) / CLOCKS_PER_SEC;
+			if (sortersMETA::dataType == 's') {
+				startTime = clock();
+				radixSort(duplicate, sortersMETA::ARRAYSIZE);
+				/*while (sortersMETA::currentStringIndex--) {
+					radixSort(duplicate, sortersMETA::ARRAYSIZE);
+				}*/
+				time[3] = double(clock() - startTime) / CLOCKS_PER_SEC;
+				sortersMETA::currentStringIndex = sortersMETA::STRINGMAX;
+			} else {
+				startTime = clock();
+				radixSort(duplicate, sortersMETA::ARRAYSIZE);
+				/*sortersMETA::radixSortIndex = sortersMETA::maxFloatDecimal + sortersMETA::maxFloatWhole;
+				startTime = clock();
+				while (sortersMETA::radixSortIndex--) {
+					radixSort(duplicate, sortersMETA::ARRAYSIZE);
+				}*/
+				time[3] = double(clock() - startTime) / CLOCKS_PER_SEC;
+				sortersMETA::radixSortIndex = sortersMETA::maxFloatDecimal + sortersMETA::maxFloatWhole;
+			}
 			if (!printed) {
 			cout << "Unsorted array" << endl;
 			displayArray(data);
@@ -261,6 +352,7 @@ public:
 		int maxDigits = getMaxDigits();
 		for (int digit = maxDigits; digit > 0; digit--) { //
 			countingSort(data, size, digit - 1);
+			//displayArray(data);
 		}
 
 	}
@@ -358,9 +450,16 @@ void main(void) {
 		break;
 	case 'f':
 		float fdata[sortersMETA::ARRAYSIZE];
-		for (int i = 0; i < sortersMETA::ARRAYSIZE; i++) {
+		fdata[0] = 0.0; //{ 0.0, 1.2, 0.3, 0.2, 1.5, 0.6, 2.0 };
+		fdata[1] = 1.2;
+		fdata[2] = 0.3;
+		fdata[3] = 0.2;
+		fdata[4] = 1.5;
+		fdata[5] = 0.6;
+		fdata[6] = 2.0;
+		/*for (int i = 0; i < sortersMETA::ARRAYSIZE; i++) {
 			fdata[i] =(float) (rand() % 100);
-		}
+		}*/
 		sorters<float>::processSorts(fdata);
 		break;
 	case 's':
